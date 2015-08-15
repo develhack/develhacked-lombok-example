@@ -1,0 +1,88 @@
+plugins {
+    id 'java'
+    id 'com.develhack.eclipse' version '0.1.9'
+    id 'maven'
+    id 'maven-publish'
+}
+
+group = 'com.develhack'
+archivesBaseName = 'develhacked-lombok-example'
+version = '0.1.1'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+configurations {
+    apt {
+        visible false
+    }
+}
+
+dependencies {
+    compile 'com.develhack:develhack-core:0.9.+'
+    testCompile 'org.testng:testng:6.8.+'
+    apt "com.develhack:develhacked-lombok:${version}"
+}
+
+test {
+    useTestNG()
+}
+
+task delombok {
+
+    ant.taskdef(name: 'delombok', classname: 'lombok.delombok.ant.Tasks$Delombok', classpath: configurations.apt.asPath)
+
+    doLast {
+        sourceSets.main.java.srcDirs.each { File srcDir ->
+            ant.delombok(encoding: 'UTF-8', from: srcDir, to: "${buildDir}/delombok", classpath: configurations.compile.asPath)
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            compileClasspath += [ configurations.apt ]
+        }
+    }
+    test {
+        java {
+            compileClasspath += [ configurations.apt ]
+        }
+    }
+}
+
+javadoc {
+    dependsOn delombok
+
+    options {
+        locale = 'en_US'
+        encoding = 'UTF-8'
+        links 'http://docs.oracle.com/javase/8/docs/api/'
+    }
+
+    title = "Develhacked-Lombok Example"
+    source = "${buildDir}/delombok"
+    include '**/*.java'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from "${buildDir}/javadoc"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
