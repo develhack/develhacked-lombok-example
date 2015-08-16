@@ -1,9 +1,17 @@
-plugins {
-    id 'java'
-    id 'com.develhack.eclipse' version '0.1.9'
-    id 'maven'
-    id 'maven-publish'
+buildscript {
+  repositories {
+    mavenCentral()
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'com.develhack:gradle-eclipse-plugin:+'
+  }
 }
+
+apply plugin: 'java'
+apply plugin: 'com.develhack.eclipse'
 
 group = 'com.develhack'
 archivesBaseName = 'develhacked-lombok-example'
@@ -60,29 +68,14 @@ sourceSets {
 javadoc {
     dependsOn delombok
 
+    title = "Develhacked-Lombok Example"
+
+    source "${buildDir}/delombok"
+    include '**/*.java'
+
     options {
-        locale = 'en_US'
-        encoding = 'UTF-8'
+        locale 'en_US'
+        encoding 'UTF-8'
         links 'http://docs.oracle.com/javase/8/docs/api/'
     }
-
-    title = "Develhacked-Lombok Example"
-    source = "${buildDir}/delombok"
-    include '**/*.java'
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from "${buildDir}/javadoc"
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
 }
