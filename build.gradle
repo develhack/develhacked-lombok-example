@@ -15,7 +15,7 @@ apply plugin: 'com.develhack.eclipse'
 
 group = 'com.develhack'
 archivesBaseName = 'develhacked-lombok-example'
-version = '0.1.2'
+version = '0.1.3'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -70,7 +70,7 @@ javadoc {
 
     title = "Develhacked-Lombok Example"
 
-    source "${buildDir}/delombok"
+    source = "${buildDir}/delombok"
     include '**/*.java'
 
     options {
